@@ -52,9 +52,9 @@ class DatabaseHelper {
     print("User tables Created");
   }
 
-  Future<int> saveUser(User user) async {
+  Future<int> saveUser(LogedInUser logedInUser) async {
     var dbClient = await db;
-    int res = await dbClient.insert("User", user.toMap());
+    int res = await dbClient.insert("User", logedInUser.toMap());
     if (res != null) {
       print("Data Insreted Into db");
     }

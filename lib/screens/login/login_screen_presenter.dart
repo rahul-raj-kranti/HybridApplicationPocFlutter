@@ -2,7 +2,7 @@ import 'package:edumarshal/data/rest_ds.dart';
 import 'package:edumarshal/models/user.dart';
 
 abstract class LoginScreenContract {
-  void onLoginSuccess(User user);
+  void onLoginSuccess(LogedInUser user);
   void onLoginError(String errorTxt);
 }
 
@@ -13,7 +13,7 @@ class LoginScreenPresenter {
 
   goForLogin(String username, String password) {
     api.login(username, password).then(
-            (User user) {_view.onLoginSuccess(user);}
+            (LogedInUser user) {_view.onLoginSuccess(user);}
     ).catchError((Exception error) => _view.onLoginError(error.toString()));
   }
 }

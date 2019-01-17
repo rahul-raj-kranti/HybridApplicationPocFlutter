@@ -3,8 +3,9 @@ import 'dart:async';
 import 'package:edumarshal/utils/network_util.dart';
 import 'package:edumarshal/models/user.dart';
 
-class RestDatasource {
+class RestDatasource  {
   NetworkUtil _netUtil = new NetworkUtil();
+  LogedInUser logedInUser = new LogedInUser();
   static final BASE_URL = "http://52.187.65.59:88";
   static final grant_type = "password";
 
@@ -15,8 +16,15 @@ class RestDatasource {
     return headers;
   }
 
-  // for login
-  Future<User> login(String username, String password) {
+  /**
+   * This method call the login api and performe login task
+   *
+   * @params username, password.
+   *
+   * @return logedInUser
+   *
+   */
+  Future<LogedInUser> login(String username, String password) {
     return _netUtil
         .post(BASE_URL + "/Token",
         body: {
@@ -28,8 +36,17 @@ class RestDatasource {
         encoding: null)
         .then((dynamic res) {
       print("Api response:" + res.toString());
-      //if (res["access_token"] == null) throw new Exception(res["error"]);
-      return new User.map(res, username, password);
+//making user object using api response
+        logedInUser.username = username;
+        logedInUser.password = password;
+        logedInUser.accessToken = res["access_token"];
+        logedInUser.tokenType = res["token_type"];
+        logedInUser.XContextId = res["X-ContextId"];
+        logedInUser.XRX = res["X-RX"];
+        logedInUser.error_description = res["error_description"];
+        logedInUser.error = res["error"];
+
+      return logedInUser;
     });
   }
 

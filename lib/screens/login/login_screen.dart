@@ -14,9 +14,9 @@ class _LoginScreenState extends State<LoginScreen>
     implements LoginScreenContract, AuthStateListener {
   final _formKey = GlobalKey<FormState>();
   final scaffoldKey = new GlobalKey<ScaffoldState>();
+  LogedInUser logedInUser = new LogedInUser();
+
   bool _isLoading = false;
-  String _password;
-  String _username;
   LoginScreenPresenter _presenter;
 
   @override
@@ -36,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen>
     if (form.validate()) {
       setState(() => _isLoading = true);
       form.save();
-      _presenter.goForLogin(_username, _password);
+      _presenter.goForLogin(logedInUser.username, logedInUser.password);
     }
   }
 
@@ -99,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen>
               keyboardType: TextInputType.text,
               autofocus: true,
               obscureText: false,
-              onSaved: (val) => _username = val,
+              onSaved: (val) => logedInUser.username = val,
               validator: (val) {
                 if (val.isEmpty) {
                   return "Required Field";
@@ -122,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen>
             child: TextFormField(
               autofocus: true,
               obscureText: true,
-              onSaved: (val) => _password = val,
+              onSaved: (val) => logedInUser.password = val,
               validator: (val) {
                 if (val.isEmpty) {
                   return "Required Field";
@@ -158,18 +158,20 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   @override
-  void onLoginSuccess(User user) async {
+  void onLoginSuccess(LogedInUser user) async {
+
     //_showSnackBar(user.toString());
     var authStateProvider = new AuthStateProvider();
-    if (user.access_token != null) {
+    if (user.accessToken != null) {
       setState(() => _isLoading = false);
       var db = new DatabaseHelper();
       await db.saveUser(user);
       //await db.deleteUsers();
       authStateProvider.notify(AuthState.LOGGED_IN);
-    }
+    }else{
     this.onLoginError(user.error_description);
     authStateProvider.notify(AuthState.LOGGED_OUT);
+    }
 
   }
 }

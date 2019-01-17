@@ -1,39 +1,76 @@
-class User {
+class LogedInUser {
   String _username;
   String _password;
 
-//  User(this._username, this._password);
+  String _accessToken;
+  String _tokenType ;
+  String _XContextId;
 
-  String access_token = null;
-  String token_type = null;
-  String X_ContextId = null;
-  String X_RX = null;
-  String error = null;
-  String error_description = null;
+  String get username => _username;
 
-  User.map(dynamic obj, _username, _password) {
-    this.access_token = obj["access_token"];
-    this.token_type = obj["token_type"];
-    this.X_ContextId = obj["X-ContextId"];
-    this.X_RX = obj["X-RX"];
-    this._username = _username;
-    this._password = _password;
-    this.error = obj["error"];
-    this.error_description = obj["error_description"];
+  set username(String value) {
+    _username = value;
   }
 
-//
-//  String get username => _username;
-//  String get password => _password;
+  String _XRX;
+  String _error;
+  String _error_description ;
 
+  String get password => _password;
+
+  set password(String value) {
+    _password = value;
+  }
+
+  String get accessToken => _accessToken;
+
+  set accessToken(String value) {
+    _accessToken = value;
+  }
+
+  String get tokenType => _tokenType;
+
+  set tokenType(String value) {
+    _tokenType = value;
+  }
+
+  String get XContextId => _XContextId;
+
+  set XContextId(String value) {
+    _XContextId = value;
+  }
+
+  String get XRX => _XRX;
+
+  set XRX(String value) {
+    _XRX = value;
+  }
+
+  String get error => _error;
+
+  set error(String value) {
+    _error = value;
+  }
+
+  String get error_description => _error_description;
+  /**
+   * @params value.
+   *
+   * which is geten from api.
+   */
+  set error_description(String value) {
+    _error_description = value;
+  }
+
+  // this map requird for SQLlite Db to save user
   Map<String, dynamic> toMap() {
     var map = new Map<String, dynamic>();
-    map["username"] = _username;
-    map["password"] = _password;
-    map["accessToken"] = access_token;
-    map["tokenType"] = token_type;
-    map["xContextId"] = X_ContextId;
-    map["xRX"] = X_RX;
+    map["username"] = username;
+    map["password"] = password;
+    map["accessToken"] = accessToken;
+    map["tokenType"] = tokenType;
+    map["xContextId"] = XContextId;
+    map["xRX"] = XRX;
 
     return map;
   }
