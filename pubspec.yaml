@@ -1,0 +1,39 @@
+name: edumarshal
+description: edumarshal is an app which provide education system for better futter.
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  sqflite: 1.0.0
+  path_provider: ^0.4.1
+
+  cupertino_icons: ^0.1.2
+  http: any
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+
+
+  uses-material-design: true
+
+
+  assets:
+    - images/edu.png
+
+
+  fonts:
+    - family: Raleway
+      fonts:
+        - asset: fonts/Raleway-Regular.ttf
+          weight: 400
+        - asset: fonts/Raleway-Bold.ttf
+          weight: 700
+
