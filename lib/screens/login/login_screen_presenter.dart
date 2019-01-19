@@ -4,6 +4,7 @@ import 'package:edumarshal/models/user.dart';
 abstract class LoginScreenContract {
   void onLoginSuccess(LogedInUser user);
   void onLoginError(String errorTxt);
+  //void setUserBatch(UserBatch userBatch);
 }
 
 class LoginScreenPresenter {
@@ -16,4 +17,14 @@ class LoginScreenPresenter {
             (LogedInUser user) {_view.onLoginSuccess(user);}
     ).catchError((Exception error) => _view.onLoginError(error.toString()));
   }
+
+// getBatchForLogInUser(LogedInUser user) {
+//    api.getBatch(user).then((UserBatch userBatch){
+//       _view.setUserBatch(userBatch);
+//    }
+//
+//    ).catchError((Exception error) => _view.onLoginError(error.toString()));
+//
+//
+//  }
 }

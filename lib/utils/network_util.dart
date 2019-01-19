@@ -18,6 +18,9 @@ class NetworkUtil {
       if (statusCode < 200 || statusCode > 400 || json == null) {
         throw new Exception("Error while fetching data");
       }
+      print(res);
+      List responseJson = json.decode(response.body);
+      print(responseJson);
       return _decoder.convert(res);
     });
   }

@@ -4,6 +4,7 @@ import 'package:edumarshal/auth.dart';
 import 'package:edumarshal/data/database_helper.dart';
 import 'package:edumarshal/screens/login/login_screen_presenter.dart';
 import 'package:edumarshal/models/user.dart';
+import 'package:edumarshal/models/user_batch.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -15,6 +16,7 @@ class _LoginScreenState extends State<LoginScreen>
   final _formKey = GlobalKey<FormState>();
   final scaffoldKey = new GlobalKey<ScaffoldState>();
   LogedInUser logedInUser = new LogedInUser();
+  UserBatch userBatch = new UserBatch();
 
   bool _isLoading = false;
   LoginScreenPresenter _presenter;
@@ -159,21 +161,28 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   void onLoginSuccess(LogedInUser user) async {
-
     //_showSnackBar(user.toString());
     var authStateProvider = new AuthStateProvider();
     if (user.accessToken != null) {
       setState(() => _isLoading = false);
       var db = new DatabaseHelper();
-      await db.saveUser(user);
-      //await db.deleteUsers();
+       await db.saveUser(user);
+       //_presenter.getBatchForLogInUser(user);
       authStateProvider.notify(AuthState.LOGGED_IN);
-    }else{
-    this.onLoginError(user.error_description);
-    authStateProvider.notify(AuthState.LOGGED_OUT);
-    }
 
+     } else {
+      this.onLoginError(user.error_description);
+      authStateProvider.notify(AuthState.LOGGED_OUT);
+    }
   }
+//  @override
+//  void setUserBatch(userBatch) async {
+//    var authStateProvider = new AuthStateProvider();
+//    var db = new DatabaseHelper();
+//    await db.saveUserBatch(userBatch);
+//    await db.saveBatchList(userBatch);
+//    //authStateProvider.notify(AuthState.LOGGED_IN);
+//  }
 }
 
 class _welcomeText extends StatelessWidget {
