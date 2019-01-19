@@ -14,11 +14,12 @@ class HomeScreen extends StatefulWidget {
 class _homeScreen extends State<HomeScreen> implements HomeScreenContract {
   DatabaseHelper db = new DatabaseHelper();
   LogedInUser logedInUser = new LogedInUser();
-  UserBatch userBatch = new UserBatch();
+  //UserBatch userBatch = new UserBatch();
   final _formKey = GlobalKey<FormState>();
   final scaffoldKey = new GlobalKey<ScaffoldState>();
   HomeScreenPresenter _presenter;
   var UserCredential;
+  Map batchId;
   List<String> _batchList = [];
   var selectedBatch = "Select Batch"; //default value
   List<String> studentList = [];
@@ -231,7 +232,7 @@ class _homeScreen extends State<HomeScreen> implements HomeScreenContract {
   loadItemData() async {
     studentList.add("StudentA");
     studentList.add("StudentB");
-    UserCredential = await db.getBatch("User");
+    UserCredential = await db.getStoreData("User");
     //print(UserCredential);
 
     logedInUser.accessToken = UserCredential[0]["accessToken"];
@@ -256,8 +257,11 @@ class _homeScreen extends State<HomeScreen> implements HomeScreenContract {
   void setUserBatch(userBatch) async {
     _batchList = userBatch.batchList;
     print(_batchList);
-    await db.saveUserBatch(userBatch);
-    await db.saveBatchList(userBatch);
+    batchId = userBatch.batchId;
+    print(batchId);
+    if(!await db.isExistingData("BatchList")){
+        await db.saveBatchList(userBatch);
+    }
   }
 
   void _showSnackBar(String text) {

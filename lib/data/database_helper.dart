@@ -45,7 +45,9 @@ class DatabaseHelper {
     );
     await db.execute(
         "CREATE TABLE BatchList("
-            "BatchList TEXT)"
+            "id INTEGER PRIMARY KEY, "
+            "BatchList TEXT, "
+            "batch TEXT)"
     );
     //print("User tables Created");
   }
@@ -59,14 +61,14 @@ class DatabaseHelper {
     return res;
   }
 
-  Future<int> saveUserBatch(UserBatch userBatch) async {
-    var dbClient = await db;
-    int res = await dbClient.insert("UserBatch", userBatch.userBatchMap());
-    if (res != null) {
-      print("User Batch response Data Insreted Into db");
-    }
-    return res;
-  }
+//  Future<int> saveUserBatch(UserBatch userBatch) async {
+//    var dbClient = await db;
+//    int res = await dbClient.insert("UserBatch", userBatch.userBatchMap());
+//    if (res != null) {
+//      print("User Batch response Data Insreted Into db");
+//    }
+//    return res;
+//  }
   Future<int> saveBatchList(UserBatch userBatch) async {
     var dbClient = await db;
     int res = await dbClient.insert("BatchList", userBatch.batchListMap());
@@ -86,17 +88,14 @@ class DatabaseHelper {
   }
 
 
-//   getTable(String tableName) async {
-//    var dbClient = await db;
-//    var table = await dbClient.query(tableName);
-//    if(table.length >0){
-//      print(table);
-//      return table;
-//    }
-//    return null;
-//  }
+  Future<bool> isExistingData(String tableName) async {
+    var dbClient = await db;
+    var res = await dbClient.query(tableName);
 
-  Future<List<Map>>getBatch(String tableName) async {
+    return res.length > 0 ? true : false;
+  }
+
+  Future<List<Map>>getStoreData(String tableName) async {
     var dbClient = await db;
     return await dbClient.rawQuery("SELECT * FROM "+tableName);
   }

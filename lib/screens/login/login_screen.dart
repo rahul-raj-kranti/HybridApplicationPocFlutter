@@ -16,7 +16,7 @@ class _LoginScreenState extends State<LoginScreen>
   final _formKey = GlobalKey<FormState>();
   final scaffoldKey = new GlobalKey<ScaffoldState>();
   LogedInUser logedInUser = new LogedInUser();
-  UserBatch userBatch = new UserBatch();
+  //UserBatch userBatch = new UserBatch();
 
   bool _isLoading = false;
   LoginScreenPresenter _presenter;
