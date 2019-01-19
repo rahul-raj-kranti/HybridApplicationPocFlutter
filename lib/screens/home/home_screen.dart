@@ -14,16 +14,18 @@ class HomeScreen extends StatefulWidget {
 class _homeScreen extends State<HomeScreen> implements HomeScreenContract {
   DatabaseHelper db = new DatabaseHelper();
   LogedInUser logedInUser = new LogedInUser();
+  Map postDetails = new Map();
   //UserBatch userBatch = new UserBatch();
   final _formKey = GlobalKey<FormState>();
   final scaffoldKey = new GlobalKey<ScaffoldState>();
   HomeScreenPresenter _presenter;
   var UserCredential;
-  Map batchId;
+  Map batchIdAgainstBatchName;
+  Map userIdAgainstStudentsName;
   List<String> _batchList = [];
   var selectedBatch = "Select Batch"; //default value
-  List<String> studentList = [];
-
+  //List<String> studentList = [];
+  List<String> studentList =[];
   var selectedStudent = "Student Name"; //default value
 
   @override
@@ -80,7 +82,12 @@ class _homeScreen extends State<HomeScreen> implements HomeScreenContract {
               );
             }).toList(),
             onChanged: (String _selectedBatch) {
-              //TODO code Implementation
+              int id =_getBatchId(_selectedBatch);
+
+              if(id!=null){
+                this._submit(id);
+
+              }
               setState(() {
                 this.selectedBatch = _selectedBatch;
               });
@@ -126,7 +133,18 @@ class _homeScreen extends State<HomeScreen> implements HomeScreenContract {
               );
             }).toList(),
             onChanged: (String _selectedStudent) {
-              //TODO code Implementation
+
+              int id =_userId(_selectedStudent);
+
+              if(id!=null){
+                String  userId = id.toString();
+                postDetails["userId"] = userId;
+                print("PostDetails");
+                print(postDetails);
+
+              }else{
+                //TODO code
+              }
               setState(() {
                 this.selectedStudent = _selectedStudent;
               });
@@ -228,10 +246,11 @@ class _homeScreen extends State<HomeScreen> implements HomeScreenContract {
       ),
     );
   }
-
+  void _submit(int id){
+    String  batchId = id.toString();
+    _presenter.getStudentsData(logedInUser , batchId);
+  }
   loadItemData() async {
-    studentList.add("StudentA");
-    studentList.add("StudentB");
     UserCredential = await db.getStoreData("User");
     //print(UserCredential);
 
@@ -241,13 +260,16 @@ class _homeScreen extends State<HomeScreen> implements HomeScreenContract {
     _presenter.getBatchForLogInUser(logedInUser);
   }
 
-//  String _getbatchId(String _batchname) {
-//    var mapAgainstBatchNameIdPairs = new Map<String, String>();
-//    mapAgainstBatchNameIdPairs["id"] = userBatch.batchId;
-//    var id = mapAgainstBatchNameIdPairs[_batchname];
-//    return id;
-//  }
-
+  int _getBatchId(String _selectedBatchName) {
+     var id = batchIdAgainstBatchName[_selectedBatchName];
+     print(id);
+    return id;
+  }
+  int _userId(String _selectedStudentName) {
+    var id = userIdAgainstStudentsName[_selectedStudentName];
+    print(id);
+    return id;
+  }
   @override
   void onBatchError(String errorTxt) {
     _showSnackBar(errorTxt);
@@ -256,14 +278,25 @@ class _homeScreen extends State<HomeScreen> implements HomeScreenContract {
   @override
   void setUserBatch(userBatch) async {
     _batchList = userBatch.batchList;
-    print(_batchList);
-    batchId = userBatch.batchId;
-    print(batchId);
+    //print(_batchList);
+    batchIdAgainstBatchName = userBatch.batchId;
+   // print(batchIdAgainstBatchName);
     if(!await db.isExistingData("BatchList")){
         await db.saveBatchList(userBatch);
     }
   }
-
+  @override
+  void setStudentsDetails(getStudentByBatch) async {
+    studentList.add("TEST A");
+    studentList.add("TEST B");
+    studentList = getStudentByBatch.studentsList;
+   // print(studentList);
+    userIdAgainstStudentsName = getStudentByBatch.studentUserId;
+   // print(userIdAgainstStudentsName);
+    if(!await db.isExistingData("StudentDetails")){
+      await db.saveStudentDetails(getStudentByBatch);
+    }
+  }
   void _showSnackBar(String text) {
     const Duration _kSnackBarDisplayDuration = Duration(milliseconds: 400);
     scaffoldKey.currentState.showSnackBar(

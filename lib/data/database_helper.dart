@@ -4,6 +4,7 @@ import 'dart:io' as io;
 import 'package:path/path.dart';
 import 'package:edumarshal/models/user.dart';
 import 'package:edumarshal/models/user_batch.dart';
+import 'package:edumarshal/models/GetStudentByBatch.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -39,15 +40,19 @@ class DatabaseHelper {
         "tokenType TEXT,"
         "xContextId TEXT,"
         "xRX TEXT)");
-    await db.execute(
-        "CREATE TABLE UserBatch("
-            "batch TEXT)"
-    );
+    //BatchList Table
     await db.execute(
         "CREATE TABLE BatchList("
             "id INTEGER PRIMARY KEY, "
             "BatchList TEXT, "
             "batch TEXT)"
+    );
+    //StudentsDetails Table
+    await db.execute(
+        "CREATE TABLE StudentDetails("
+            "id INTEGER PRIMARY KEY, "
+            "studentsList TEXT, "
+            "UserId TEXT)"
     );
     //print("User tables Created");
   }
@@ -61,14 +66,14 @@ class DatabaseHelper {
     return res;
   }
 
-//  Future<int> saveUserBatch(UserBatch userBatch) async {
-//    var dbClient = await db;
-//    int res = await dbClient.insert("UserBatch", userBatch.userBatchMap());
-//    if (res != null) {
-//      print("User Batch response Data Insreted Into db");
-//    }
-//    return res;
-//  }
+  Future<int> saveStudentDetails(GetStudentByBatch getStudentByBatch) async {
+    var dbClient = await db;
+    int res = await dbClient.insert("StudentDetails", getStudentByBatch.studentsMap());
+    if (res != null) {
+      print("Student Details Insreted Into db");
+    }
+    return res;
+  }
   Future<int> saveBatchList(UserBatch userBatch) async {
     var dbClient = await db;
     int res = await dbClient.insert("BatchList", userBatch.batchListMap());
