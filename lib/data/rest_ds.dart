@@ -4,6 +4,7 @@ import 'package:edumarshal/utils/network_util.dart';
 import 'package:edumarshal/models/user.dart';
 import 'package:edumarshal/models/user_batch.dart';
 import 'package:edumarshal/models/GetStudentByBatch.dart';
+import 'package:edumarshal/models/LeaveEntity.dart';
 
 class RestDatasource  {
   NetworkUtil _netUtil = new NetworkUtil();
@@ -87,6 +88,27 @@ class RestDatasource  {
         dynamic res) {
       print("Api getStudentsDetails response:" + res.toString());
       return new GetStudentByBatch.map(res);
+    });
+  }
+
+
+  //post leave
+  Future<LeaveEntity> postLeaveRequest(LogedInUser user, Map postDetails) {
+    String startDate = postDetails["startDate"];
+
+    return _netUtil
+        .post(BASE_URL + "/api/Leave",
+        body: {
+          "userId": postDetails["userId"],
+          "reason": postDetails["reason"],
+          "startDate": postDetails["startDate"],
+          "endDate": postDetails["endDate"],
+        },
+        headers: studentsHeaders(user),
+        encoding: null)
+        .then((dynamic res) {
+      print("Api Leave response:" + res.toString());
+      return LeaveEntity.map(res);
     });
   }
 }

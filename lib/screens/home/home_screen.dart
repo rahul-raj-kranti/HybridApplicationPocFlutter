@@ -5,6 +5,8 @@ import 'package:edumarshal/models/user_batch.dart';
 import 'dart:convert';
 import 'package:edumarshal/screens/home/home_sceen_presenter.dart';
 import 'package:edumarshal/models/user.dart';
+import 'package:intl/intl.dart';
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -12,6 +14,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _homeScreen extends State<HomeScreen> implements HomeScreenContract {
+  final dateFormat = DateFormat("yyyy-MM-dd");
+  var formatter = new DateFormat('yyyy-MM-dd');
+  DateTime date;
+  var reasonForLeave;
   DatabaseHelper db = new DatabaseHelper();
   LogedInUser logedInUser = new LogedInUser();
   Map postDetails = new Map();
@@ -27,7 +33,7 @@ class _homeScreen extends State<HomeScreen> implements HomeScreenContract {
   //List<String> studentList = [];
   List<String> studentList =[];
   var selectedStudent = "Student Name"; //default value
-
+  bool _isLoading = false;
   @override
   void initState() {
     super.initState();
@@ -37,7 +43,17 @@ class _homeScreen extends State<HomeScreen> implements HomeScreenContract {
     _presenter = new HomeScreenPresenter(this);
     loadItemData();
   }
+ void _submitLeave() async{
+   final form = _formKey.currentState;
 
+   if (postDetails.isNotEmpty) {
+     setState(() => _isLoading = true);
+     _presenter.doLeaveRequest(logedInUser, postDetails);
+   }else{
+     this.onBatchError("All are mendetory fields");
+   }
+
+ }
   @override
   Widget build(BuildContext context) {
     //if (batchList.length == 0) {
@@ -111,7 +127,7 @@ class _homeScreen extends State<HomeScreen> implements HomeScreenContract {
                 fontWeight: FontWeight.w700),
           )),
     );
-    var _StudentNameDropDownButton = new Container(
+    var _StudentNameDropDownButton  = new Container(
         margin: const EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 10.0),
         color: Colors.white,
         child: DropdownButtonHideUnderline(
@@ -133,7 +149,6 @@ class _homeScreen extends State<HomeScreen> implements HomeScreenContract {
               );
             }).toList(),
             onChanged: (String _selectedStudent) {
-
               int id =_userId(_selectedStudent);
 
               if(id!=null){
@@ -169,17 +184,30 @@ class _homeScreen extends State<HomeScreen> implements HomeScreenContract {
     );
     var _reasonLableFields = Container(
       margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 10.0),
-      child: TextFormField(
+      child: TextField(
         keyboardType: TextInputType.text,
         autofocus: true,
         textAlign: TextAlign.start,
-        textDirection: TextDirection.ltr,
+        //textDirection: TextDirection.ltr,
         obscureText: false,
         maxLines: null,
         style: TextStyle(
           color: Colors.black,
         ),
-        onSaved: null,
+//        onSaved:  (val) =>  postDetails["reason"] = val,
+//        validator: (val) {
+//          if (val.isEmpty) {
+//            return "Required Field";
+//          }
+//        },
+          onChanged: (String resons){
+            setState((){
+              reasonForLeave = resons;
+              postDetails["reason"] = reasonForLeave;
+            });
+
+          },
+
         decoration: new InputDecoration(
           filled: true,
           fillColor: Colors.white,
@@ -190,6 +218,147 @@ class _homeScreen extends State<HomeScreen> implements HomeScreenContract {
       ),
     );
 
+    final dateFieldLebel =  Container(
+        margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 10.0),
+        color: Colors.yellow,
+        alignment: Alignment.center,
+        child: Column(
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text("Start Date*",
+                      ///textDirection: TextDirection.ltr,
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20.0,
+                          fontFamily: "Raleway",
+                          fontWeight: FontWeight.w700)
+                  ),
+
+                ),
+                Container(width: 10.0,),
+                Expanded(
+                  child: Text("End Date*",
+                      //textDirection: TextDirection.ltr,
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20.0,
+                          fontFamily: "Raleway",
+                          fontWeight: FontWeight.w700)
+                  ),
+
+                ),
+              ],
+            )
+          ],
+        ),
+      );
+    final dateField = Padding(
+            padding:EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 10.0),
+              child:Column(
+                 children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                      Expanded(
+                      child: DateTimePickerFormField(
+                      format: dateFormat,
+                      dateOnly:true,
+                      decoration: InputDecoration(
+                          hintText: "DD-MM-YYYY",
+                          hintStyle:TextStyle(
+                              color: Colors.black
+                          ),
+                        prefixIcon: Padding(
+                          padding: EdgeInsets.all(0.0),
+                          child: Icon(Icons.calendar_today,
+                              color: Colors.black),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      obscureText: false,
+                      style: TextStyle(
+                        color: Colors.black,
+                      ),
+                  onChanged: (dt){ date = dt;
+
+                  String  startDate = formatter.format(dt);
+                  postDetails["startDate"] = startDate;
+                  print("PostDetails");
+                  print(postDetails);
+                  setState(() {
+                    date = dt;
+                  }
+                );
+              },
+              validator: (dt) {
+                if (dt == null) {
+                  return "Required Field";
+                }
+              },
+            ),
+          ),
+        Container(width: 10.0,),
+                      Expanded(
+                        child: DateTimePickerFormField(
+                            dateOnly: true,
+                            format: dateFormat,
+                            decoration: InputDecoration(
+                              hintText: "DD-MM-YYYY",
+                              hintStyle:TextStyle(
+                                 color: Colors.black
+                               ),
+                              prefixIcon: Padding(
+                                padding: EdgeInsets.all(0.0),
+                                child: Icon(Icons.calendar_today,
+                                    color: Colors.black
+                                ),
+                              ),
+                              filled: true,
+                              fillColor: Colors.white,
+                            ),
+                            obscureText: false,
+                            style: TextStyle(
+                              color: Colors.black,
+                            ),
+                            onChanged: (dt) {
+                              date = dt;
+                              String  endDate = formatter.format(dt);
+                              postDetails["endDate"] = endDate;
+                              print("PostDetails");
+                              print(postDetails);
+                              setState(() {
+                                date = dt;
+                              }
+                              );
+                            },
+          validator: (dt) {
+            if (dt == null) {
+              return "Required Field";
+            }
+          }
+
+      ),
+      ),
+                      ],
+
+                    ),
+
+                 ],
+              ),
+        );
+
+ var mendotryFields = Container(
+   margin: EdgeInsets.fromLTRB(10.0, 50.0, 50.0, 10.0),
+
+     color:Colors.yellow,
+    child:Text("* All Fields are mendetory",style: TextStyle(
+        color: Colors.black,
+        fontSize: 20.0,
+        fontFamily: "Raleway",
+        fontWeight: FontWeight.w700))
+   );
     var _submit = Padding(
       padding: new EdgeInsets.fromLTRB(0.0, 100.0, 0.0, 0.0),
       child: Container(
@@ -197,7 +366,7 @@ class _homeScreen extends State<HomeScreen> implements HomeScreenContract {
         width: 250.0,
         height: 50.0,
         child: RaisedButton(
-            color: Theme.of(context).buttonColor,
+            color: Colors.blue,
             child: Text(
               'SUBMIT',
               style: TextStyle(
@@ -209,12 +378,15 @@ class _homeScreen extends State<HomeScreen> implements HomeScreenContract {
             shape: new RoundedRectangleBorder(
                 borderRadius: new BorderRadius.circular(5.0)),
             elevation: 6.0,
-            onPressed: null),
+           onPressed: () {
+              _submitLeave();
+         },
+        ),
       ),
     );
 
     return new Scaffold(
-      //key: scaffoldKey,
+      key: scaffoldKey,
       backgroundColor: Theme.of(context).buttonColor,
       appBar: new AppBar(
         automaticallyImplyLeading: false,
@@ -240,7 +412,13 @@ class _homeScreen extends State<HomeScreen> implements HomeScreenContract {
             _StudentNameDropDownButton,
             _reasonLable,
             _reasonLableFields,
-            _submit
+            dateFieldLebel,
+            dateField,
+            mendotryFields,
+            _isLoading
+                ? Center(child: new CircularProgressIndicator())
+                : _submit,
+
           ],
         ),
       ),
@@ -274,7 +452,18 @@ class _homeScreen extends State<HomeScreen> implements HomeScreenContract {
   void onBatchError(String errorTxt) {
     _showSnackBar(errorTxt);
   }
-
+  @override
+  void setLeaveDetails(leaveObj) async {
+    setState(() => _isLoading = false);
+    var id = int.parse(leaveObj.id);
+    assert(id is int);
+    print(id);
+    if(id > 0){
+      Navigator.of(context).pushNamed("/welcome");
+    }else{
+      this.onBatchError("All Ready Applied For Leave!");
+    }
+  }
   @override
   void setUserBatch(userBatch) async {
     _batchList = userBatch.batchList;
@@ -309,28 +498,4 @@ class _homeScreen extends State<HomeScreen> implements HomeScreenContract {
           )),
     );
   }
-//  void main() {
-//     var map = json.encode(_batches);
-//     print("voidaMain");
-//     print(_batches.toString());
-//    print(map);
-
-//for (var value in map.values) print(value);
-//for (int i = 0; i < map.length; i++) {
-//final list = map.toList(growable: true);
-//     // print(list);
-//    //for (var value in map.values) print(value);
-//    //}
-//        for (var x = 0; x < _batches.length; x++) {
-//      var courseName = _batches[x]["courseName"];
-//      if (_batches[x]["batchs"].length > 0) {
-//        for (var i = x; i < _batches[x]["batchs"].length; i++) {
-//          var _batchname = courseName + _batches[x]["batchs"][i]["batchName"];
-//          var _batchId = _batches[x]["batchs"][i]["id"];
-//          parsjsonToBatchlist.add(_batchname);
-//          mapAgainstBatchNameIdPairs[_batchname] = _batchId;
-//        }
-//      }
-//    }
-//}
 }
